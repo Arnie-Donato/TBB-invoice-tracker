@@ -5,5 +5,8 @@
   "scripts": {
     "start": "node server.js",
     "test": "node --check app.js"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^6.3.289"
   }
 }
