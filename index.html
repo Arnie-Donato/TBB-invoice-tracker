@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#102a43" />
+    <title>PayTrack</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div><p class="eyebrow">PERSONAL FINANCE OPERATIONS</p><h1>PayTrack</h1><a id="driveFolder" target="_blank" rel="noreferrer">Invoice Inbox: Google Drive</a></div>
+      <button id="resetDemo" class="secondary" type="button">Reset demo data</button>
+    </header>
+    <main>
+      <section class="hero">
+        <div><h2>Know exactly what has been paid.</h2><p>Track invoices, import Chase transactions, and confirm matches before closing the loop.</p></div>
+        <button class="primary" id="openInvoice" type="button">+ Add invoice</button>
+      </section>
+      <section class="metrics" aria-label="Summary">
+        <article><span>Unpaid</span><strong id="unpaidCount">0</strong><small id="unpaidAmount">$0.00</small></article>
+        <article><span>Overdue</span><strong id="overdueCount">0</strong><small id="overdueAmount">$0.00</small></article>
+        <article><span>Paid this month</span><strong id="paidCount">0</strong><small id="paidAmount">$0.00</small></article>
+        <article><span>Needs review</span><strong id="reviewCount">0</strong><small>possible matches</small></article>
+      </section>
+      <nav class="tabs" aria-label="Tracker sections">
+        <button class="active" data-tab="invoices">Invoices</button>
+        <button data-tab="transactions">Chase transactions</button>
+        <button data-tab="matches">Review matches <span id="matchBadge"></span></button>
+      </nav>
+      <section id="invoices" class="panel active">
+        <div class="toolbar"><input id="search" type="search" placeholder="Search vendor, sender, invoice #, amount…" /><select id="statusFilter"><option value="">All statuses</option><option>New</option><option>For review</option><option>Approved</option><option>Paid</option></select></div>
+        <div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Vendor / sender</th><th>Amount</th><th>Due</th><th>Status</th><th>Payment proof</th><th></th></tr></thead><tbody id="invoiceRows"></tbody></table></div>
+      </section>
+      <section id="transactions" class="panel">
+        <div class="import-card"><div><h3>Import Chase CSV</h3><p>Upload a Chase transaction export. The ledger prevents a transaction from being confirmed twice.</p></div><label class="primary file-label">Upload CSV<input id="chaseUpload" type="file" accept=".csv,text/csv" /></label></div>
+        <div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>State</th><th>Linked invoice</th></tr></thead><tbody id="transactionRows"></tbody></table></div>
+      </section>
+      <section id="matches" class="panel"><div id="matchList" class="match-list"></div></section>
+    </main>
+    <dialog id="invoiceDialog"><form id="invoiceForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">NEW RECORD</p><h2>Add invoice</h2></div><button class="icon" value="cancel" aria-label="Close">×</button></div><div class="form-grid"><label>Vendor<input required name="vendor" placeholder="e.g. Blue Cross" /></label><label>Sender email<input required type="email" name="email" placeholder="billing@vendor.com" /></label><label>Invoice number<input name="invoiceNo" placeholder="INV-1001" /></label><label>Amount<input required name="amount" type="number" min="0.01" step="0.01" /></label><label>Invoice date<input required name="invoiceDate" type="date" /></label><label>Due date<input name="dueDate" type="date" /></label><label>Status<select name="status"><option>New</option><option>For review</option><option>Approved</option></select></label><label>Invoice file (optional)<input name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.csv,.xlsx" /></label><label class="full">Notes<textarea name="notes" rows="3" placeholder="Anything useful when reviewing this payment"></textarea></label></div><div class="dialog-actions"><button value="cancel" class="secondary">Cancel</button><button class="primary" value="default">Save invoice</button></div></form></dialog>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
