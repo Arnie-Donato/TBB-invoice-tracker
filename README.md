@@ -13,7 +13,7 @@ Open `http://localhost:4173`. No dependency download is required.
 ## Current MVP scope
 
 - Invoice entry, search, statuses, and manual payment confirmation
-- Chase CSV and text-based PDF wire-activity import with duplicate transaction protection
+- Chase CSV and Chase wire-activity PDF import (including `Aug 6, 2026` date format), duplicate protection, and Processing-to-Sent updates
 - Suggested exact-amount / date-window matches and explicit review
 - Local browser storage (data stays on the device)
 
