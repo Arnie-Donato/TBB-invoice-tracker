@@ -20,3 +20,7 @@ Open `http://localhost:4173`. No dependency download is required.
 ## Next integration required
 
 The configured Invoice Inbox is Google Drive folder `1HePmoV96nSX7zIoToWRcuNGDo00IL3te`. Google Drive sync still needs a Google Workspace OAuth client because a sharing link alone does not grant the app permission to list or download files. Before production use, move data storage from browser local storage to Supabase and add user authentication.
+
+## Database setup
+
+This app is ready for Supabase. Create a Supabase project, run `supabase/schema.sql` in its SQL Editor, then copy the Project URL and anon key into `config.js`. In Supabase Authentication, add the deployed GitHub Pages URL as a redirect URL. The app will send a magic sign-in link to your email; invoices and transactions are isolated to that signed-in user. Local browser storage remains only as an offline fallback.
