@@ -11,16 +11,14 @@ async function accessToken(refreshToken: string) {
 }
 
 function textFromFilename(name: string) { return name.replace(/\.pdf$/i, '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim() }
-function toIsoDate(value?: string) {
-  if (!value) return null
-  const parsed = new Date(value.replace(/(\d{1,2})(st|nd|rd|th)/gi, '$1'))
-  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString().slice(0, 10)
-}
+function toIsoDate(value?: string) { if (!value) return null; const parsed = new Date(value.replace(/(\d{1,2})(st|nd|rd|th)/gi, '$1')); return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString().slice(0, 10) }
 function invoiceFields(text: string, filename: string) {
   const compact = text.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ')
   const invoiceNo = compact.match(/(?:invoice\s*(?:number|no\.?|#)?|inv\.?\s*(?:number|no\.?|#))\s*[:#-]?\s*([A-Z0-9][A-Z0-9/-]{2,})/i)?.[1] || null
-  const amountMatches = [...compact.matchAll(/(?:amount\s*due|balance\s*due|invoice\s*total|total\s*(?:amount)?|amount\s*payable)\s*[:$-]?\s*\$?\s*([\d,]+\.\d{2})/gi)]
-  const amount = amountMatches.length ? Number(amountMatches[amountMatches.length - 1][1].replace(/,/g, '')) : 0
+  const labelledAmounts = [...compact.matchAll(/(?:amount\s*due|balance\s*due|invoice\s*total|total\s*(?:amount)?|amount\s*payable)\s*[:$-]?\s*(?:USD|PHP|\$|₱)?\s*([\d,]+\.\d{2})/gi)]
+  const currencyAmounts = [...compact.matchAll(/(?:USD|PHP|\$|₱)\s*([\d,]+\.\d{2})/gi)]
+  const amounts = labelledAmounts.length ? labelledAmounts : currencyAmounts
+  const amount = amounts.length ? Number(amounts[amounts.length - 1][1].replace(/,/g, '')) : 0
   const dueRaw = compact.match(/(?:due\s*date|payment\s*due|due)\s*[:#-]?\s*([A-Z][a-z]+\s+\d{1,2},?\s+\d{4}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/i)?.[1]
   const email = compact.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0] || 'pending@drive.local'
   return { vendor: textFromFilename(filename), email, invoice_no: invoiceNo, amount: Number.isFinite(amount) ? amount : 0, due_date: toIsoDate(dueRaw) }
@@ -30,10 +28,7 @@ async function readPdfFields(fileId: string, filename: string, token: string) {
   if (!response.ok) throw new Error('Could not download PDF')
   const pdf = await getDocument({ data: new Uint8Array(await response.arrayBuffer()), useWorkerFetch: false, isEvalSupported: false }).promise
   let text = ''
-  for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
-    const content = await (await pdf.getPage(pageNo)).getTextContent()
-    text += content.items.map((item: any) => item.str || '').join(' ') + '\n'
-  }
+  for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) { const content = await (await pdf.getPage(pageNo)).getTextContent(); text += content.items.map((item: any) => item.str || '').join(' ') + '\n' }
   return invoiceFields(text, filename)
 }
 
@@ -57,14 +52,7 @@ Deno.serve(async (request) => {
     const { data: existing } = await supabase.from('invoices').select('id,amount,invoice_no').eq('drive_file_id', file.id).maybeSingle()
     let fields = invoiceFields('', file.name)
     try { fields = await readPdfFields(file.id, file.name, driveToken) } catch (error) { console.warn('PDF text could not be read', { file: file.name, message: String(error) }) }
-    if (existing) {
-      if (!existing.amount || !existing.invoice_no) {
-        const { error } = await supabase.from('invoices').update(fields).eq('id', existing.id)
-        if (error) throw error
-        if (fields.amount || fields.invoice_no) enriched++
-      }
-      continue
-    }
+    if (existing) { if (!existing.amount || !existing.invoice_no) { const { error } = await supabase.from('invoices').update(fields).eq('id', existing.id); if (error) throw error; if (fields.amount || fields.invoice_no) enriched++ }; continue }
     const { error } = await supabase.from('invoices').insert({ id: crypto.randomUUID(), user_id: user.id, ...fields, status: 'New', attachment_name: file.name, drive_file_id: file.id, drive_file_url: file.webViewLink, source: 'google_drive', imported_at: file.createdTime })
     if (error) throw error
     imported++
