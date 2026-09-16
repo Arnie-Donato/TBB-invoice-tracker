@@ -10,7 +10,7 @@
   <body>
     <header class="topbar">
       <div><p class="eyebrow">PERSONAL FINANCE OPERATIONS</p><h1>PayTrack</h1><a id="driveFolder" target="_blank" rel="noreferrer">Invoice Inbox: Google Drive</a></div>
-      <div><button id="authButton" class="secondary" type="button">Connect database</button><button id="driveConnectButton" class="secondary" type="button">Connect Google Drive</button><button id="resetDemo" class="secondary" type="button">Reset demo data</button></div>
+      <div><button id="driveConnectButton" class="secondary" type="button">Connect Google Drive</button><button id="resetDemo" class="secondary" type="button">Reset demo data</button></div>
     </header>
     <main>
       <section class="hero">
@@ -40,8 +40,8 @@
       <section id="matches" class="panel"><div id="matchList" class="match-list"></div></section>
     </main>
     <dialog id="invoiceDialog"><form id="invoiceForm"><div class="dialog-head"><div><p class="eyebrow">NEW RECORD</p><h2>Add invoice</h2></div><button class="icon" type="button" data-close-invoice aria-label="Close">×</button></div><div class="form-grid"><label>Vendor<input required name="vendor" placeholder="e.g. Blue Cross" /></label><label>Sender email<input required type="email" name="email" placeholder="billing@vendor.com" /></label><label>Invoice number<input name="invoiceNo" placeholder="INV-1001" /></label><label>Amount<input required name="amount" type="number" min="0.01" step="0.01" /></label><label>Invoice date<input required name="invoiceDate" type="date" /></label><label>Due date<input name="dueDate" type="date" /></label><label>Status<select name="status"><option>New</option><option>For review</option><option>Approved</option></select></label><label>Invoice file (optional)<input name="attachment" type="file" accept=".pdf,.png,.jpg,.jpeg,.csv,.xlsx" /></label><label class="full">Notes<textarea name="notes" rows="3" placeholder="Anything useful when reviewing this payment"></textarea></label></div><div class="dialog-actions"><button type="button" data-close-invoice class="secondary">Cancel</button><button class="primary" type="submit">Save invoice</button></div></form></dialog>
-    <script src="config.js?v=7"></script>
+    <script src="config.js?v=8"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="app.js?v=8"></script>
+    <script src="app.js?v=9"></script>
   </body>
 </html>
