@@ -13,7 +13,10 @@ Deno.serve(async (request) => {
   const body = new URLSearchParams({ code, client_id: Deno.env.get('GOOGLE_DRIVE_CLIENT_ID')!, client_secret: Deno.env.get('GOOGLE_DRIVE_CLIENT_SECRET')!, redirect_uri: Deno.env.get('GOOGLE_DRIVE_REDIRECT_URI')!, grant_type: 'authorization_code' })
   const tokenResponse = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })
   const token = await tokenResponse.json()
-  if (!tokenResponse.ok || !token.refresh_token) return Response.redirect(`${appUrl}?drive=failed`, 302)
+  if (!tokenResponse.ok || !token.refresh_token) {
+    console.error('Google token exchange failed', { status: tokenResponse.status, error: token.error, description: token.error_description, hasRefreshToken: Boolean(token.refresh_token) })
+    return Response.redirect(`${appUrl}?drive=failed`, 302)
+  }
   await supabase.from('drive_connections').upsert({ user_id: pending.user_id, folder_id: Deno.env.get('GOOGLE_DRIVE_FOLDER_ID')!, refresh_token: token.refresh_token })
   await supabase.from('drive_oauth_states').delete().eq('state', state)
   return Response.redirect(`${appUrl}?drive=connected`, 302)
