@@ -10,6 +10,7 @@ create table if not exists public.invoices (
   status text not null check (status in ('New', 'For review', 'Approved', 'Paid')),
   notes text,
   attachment_name text,
+  payment_proof text,
   payment_id uuid,
   manual_paid boolean not null default false,
   paid_date date,
