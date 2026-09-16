@@ -21,6 +21,6 @@ create table if not exists public.drive_oauth_states (
 alter table public.drive_connections enable row level security;
 alter table public.drive_oauth_states enable row level security;
 
--- Browser users can see only connection status, never the refresh token.
-create policy "owner sees drive connection status" on public.drive_connections
-  for select using (auth.uid() = user_id);
+-- No browser policy is created for this table: it contains OAuth refresh tokens.
+-- Edge Functions use the service-role key and bypass RLS safely on the server.
+drop policy if exists "owner sees drive connection status" on public.drive_connections;
